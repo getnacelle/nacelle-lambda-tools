@@ -1,0 +1,19 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Environment variables
+.env
+
+# Build Output
+.build
+dist
+
+# Test Coverage
+coverage
+
+# VS Code
+.vscode

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module": "ES2020",
+    "sourceMap": true,
+    "target": "es2018",
+    "lib": ["es2018"],
+    "outDir": "dist/esm",
+    "declaration": true,
+    "moduleResolution": "node"
+  },
+  "include": ["./lib"],
+  "exclude": ["node_modules"]
+}

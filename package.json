@@ -1,0 +1,64 @@
+{
+  "name": "@nacelle/lambda-tools",
+  "version": "1.0.0",
+  "description": "Re-usable utility functions useful when working with Serverless lambdas",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
+    "clean": "rimraf ./dist",
+    "lint": "eslint ./lib",
+    "prebuild": "npm run clean",
+    "prepublishOnly": "npm run test:ci && npm run build",
+    "test": "jest --watch",
+    "test:ci": "jest --no-coverage --runInBand"
+  },
+  "keywords": [
+    "serverless",
+    "lambda",
+    "aws",
+    "nacelle"
+  ],
+  "author": "Nacelle Dev Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.59",
+    "@types/jest": "^26.0.5",
+    "@types/lambda-log": "^2.2.0",
+    "@typescript-eslint/eslint-plugin": "^3.7.0",
+    "@typescript-eslint/parser": "^3.7.0",
+    "eslint": "^7.5.0",
+    "graphql": "^15.3.0",
+    "husky": "^4.2.5",
+    "jest": "^26.1.0",
+    "jest-watch-typeahead": "^0.6.0",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^26.1.3",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.719.0",
+    "lambda-log": "^2.4.0",
+    "uuid": "^8.2.0"
+  },
+  "lint-staged": {
+    "src/**/*.(js|ts)": [
+      "prettier --write",
+      "npm run lint"
+    ],
+    "*{json, md}": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run test:ci && npm run build:ts"
+    }
+  }
+}
