@@ -9,27 +9,69 @@ export enum UpdateType {
   Remove = 'REMOVE',
 }
 
+export interface ExpressionMap {
+  conditions: QueryConditions
+  expression?: QueryExpression
+  where?: {
+    primary?: {
+      key: string
+      value: unknown
+    }
+    and?: {
+      keys: string[]
+      keyValues: [string, AttributeValue | unknown][]
+    }
+  }
+  attributeKeys?: string[]
+  attributeValues?: [string, AttributeValue | unknown][]
+  remove?: {
+    keys: string[]
+    keyValues: [string, AttributeValue | unknown][]
+  }
+  update?: {
+    keys: string[]
+    keyValues: [string, AttributeValue | unknown][]
+  }
+  updateExpressions?: string[]
+}
+
+export interface AttributeValue {
+  append?: boolean
+  value?: {
+    index?: number
+    [key: string]: unknown
+  }
+  index?: number
+}
+
+export interface PrimaryKeyValue {
+  value: unknown
+  primary?: boolean
+}
+
 export interface ProjectionFields {
   ProjectionExpression?: string
   ExpressionAttributeNames?: { [field: string]: string }
 }
 
 export interface QueryConditions {
+  tableName: string
   where: {
-    [column: string]: string | WhereObjectValue
+    [column: string]: { primary?: boolean; value: unknown }
   }
   update?: ConditionUpdateValues
   remove?: ConditionUpdateValues
   fields?: string[]
   itemIndex?: number
-  type: DBOperations
+  operation: DBOperations
+  returnValues?: string
 }
 
 export interface QueryExpression {
   TableName: string
   FilterExpression?: string
   ProjectionExpression?: string
-  Key?: { [column: string]: string | number }
+  Key?: { [column: string]: unknown }
   KeyConditionExpression?: string
   ExpressionAttributeNames?: ExpressionAttributeNames
   ExpressionAttributeValues?: ExpressionAttributeValues
@@ -52,5 +94,4 @@ export interface ExpressionAttributeValues {
 
 export interface ConditionUpdateValues {
   [column: string]: unknown
-  returnValues?: string
 }
