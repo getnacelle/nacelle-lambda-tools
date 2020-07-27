@@ -2,22 +2,20 @@ import { DynamoDB, AWSError } from 'aws-sdk'
 import { PromiseResult } from 'aws-sdk/lib/request'
 import { UpdateItemInput } from 'aws-sdk/clients/dynamodb'
 
-import { createQueryExpression } from './expressions'
+import { createExpression } from './expressions'
+import { logger } from '../logger'
 import { QueryConditions, QueryExpression, DBOperations } from './models'
 
 interface DynamoTools {
   query: (
-    tableName: string,
     queryConditions: QueryConditions
   ) => Promise<PromiseResult<DynamoDB.DocumentClient.QueryOutput, AWSError>>
 
   scan: (
-    tableName: string,
     queryConditions: QueryConditions
   ) => Promise<PromiseResult<DynamoDB.DocumentClient.ScanOutput, AWSError>>
 
   update: (
-    tableName: string,
     queryConditions: QueryConditions
   ) => Promise<
     PromiseResult<DynamoDB.DocumentClient.UpdateItemOutput, AWSError>
@@ -28,35 +26,38 @@ interface DynamoTools {
     insertItem: unknown
   ) => Promise<PromiseResult<DynamoDB.DocumentClient.PutItemOutput, AWSError>>
 
-  createQueryExpression: (
-    tableName: string,
-    conditions: QueryConditions
-  ) => QueryExpression
+  createExpression: (conditions: QueryConditions) => QueryExpression
 }
 
 function init(dynamoInstance: DynamoDB.DocumentClient): DynamoTools {
   return {
     query: async function query(
-      tableName: string,
       queryConditions: QueryConditions
     ): Promise<PromiseResult<DynamoDB.DocumentClient.QueryOutput, AWSError>> {
-      const queryOptions = createQueryExpression(tableName, queryConditions)
+      const queryOptions = createExpression(queryConditions)
+
+      logger.debug('Dynamo Query Expression', { queryOptions })
+
       return dynamoInstance.query(queryOptions).promise()
     },
     scan: async function scan(
-      tableName: string,
       queryConditions: QueryConditions
     ): Promise<PromiseResult<DynamoDB.DocumentClient.ScanOutput, AWSError>> {
-      const queryOptions = createQueryExpression(tableName, queryConditions)
+      const queryOptions = createExpression(queryConditions)
+
+      logger.debug('Dynamo Scan Expression', { queryOptions })
+
       return dynamoInstance.scan(queryOptions).promise()
     },
     update: async function update(
-      tableName: string,
       queryConditions: QueryConditions
     ): Promise<
       PromiseResult<DynamoDB.DocumentClient.UpdateItemOutput, AWSError>
     > {
-      const queryOptions = createQueryExpression(tableName, queryConditions)
+      const queryOptions = createExpression(queryConditions)
+
+      logger.debug('Dynamo Update Expression', { queryOptions })
+
       return dynamoInstance.update(queryOptions as UpdateItemInput).promise()
     },
     put: async function put(
@@ -71,7 +72,7 @@ function init(dynamoInstance: DynamoDB.DocumentClient): DynamoTools {
         })
         .promise()
     },
-    createQueryExpression,
+    createExpression,
   }
 }
 

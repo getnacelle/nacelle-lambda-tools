@@ -102,13 +102,11 @@ If the value is an object and _does_ include an `index` property, it will be use
 
 If the value is an array, the value within the list will be appended to the list that is in the database for that column.
 
-`returnValues` is an optional property that allows you to specify what type of response you'd like from Dynamo. Options can be found [here](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html#API_UpdateItem_RequestSyntax)
-
 - _queryCondition.remove (optional)_: Similar to `update`, but any value for the column will be removed. If the value is an object with an index property, then it will remove the item at that index position from that column in the db.
 
-`returnValues` is an optional property that allows you to specify what type of response you'd like from Dynamo. Options can be found [here](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html#API_UpdateItem_RequestSyntax)
+- _queryCondition.operation (required)_: The type of query being made -- Update, Query or Scan
 
-- _queryCondition.type (required)_: The type of query being made -- Update, Query or Scan
+_queryCondition.returnValues (optional)_: Allows you to specify what type of response you'd like from Dynamo. Options can be found [here](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html#API_UpdateItem_RequestSyntax)
 
 There are several examples in `src/db/dynamo/helpers.test.ts` for reference.
 
@@ -149,12 +147,13 @@ Note that not all of these properties will be present every time and that it is 
 ```js
 // input
 const queryConditions = {
+  tableName: 'Users',
   where: {
-    id: userId,
-    email: userEmail,
-    role: userRole,
+    id: { primary: true, value: userId },
+    email: { value: userEmail },
+    role: { value: userRole },
   },
-  type: DBOperations.Query,
+  operation: DBOperations.Query,
 }
 
 // output
@@ -180,22 +179,21 @@ const queryExpression = {
 ```js
 // input
 const queryConditions = {
+  tableName: 'Users',
   where: {
-    id: userId,
+    id: { primary: true, value: userId },
   },
-  type: DBOperations.Scan,
+  fields: ['id', 'email'],
+  operation: DBOperations.Query,
 }
 
 // output
 const queryExpression = {
   TableName: 'Users',
-  FilterExpression: '#id = :id',
-  ExpressionAttributeNames: {
-    '#id': 'id',
-  },
-  ExpressionAttributeValues: {
-    ':id': userId,
-  },
+  KeyConditionExpression: '#id = :id',
+  ProjectionExpression: '#id, #email',
+  ExpressionAttributeNames: { '#email': 'email', '#id': 'id' },
+  ExpressionAttributeValues: { ':id': userId },
 }
 ```
 
@@ -204,14 +202,15 @@ const queryExpression = {
 ```js
 // input
 const queryConditions = {
+  tablename: 'Users',
   where: {
-    id: userId,
+    id: { primary: true, value: userId },
   },
   update: {
-    user: { name: 'Bruce', email: userEmail },
-    returnValues: 'ALL_NEW',
+    user: { value: { name: 'Bruce', email: userEmail } },
   },
-  type: DBOperations.Update,
+  returnValues: 'ALL_NEW',
+  operation: DBOperations.Update,
 }
 
 // output
@@ -232,13 +231,14 @@ const queryExpression = {
 ```js
 // input
 const queryConditions = {
+  tableName: 'Users',
   where: {
-    id: userId,
+    id: { primary: true, value: userId },
   },
   update: {
-    spaces: { id: spaceId, role: userRole, index: 2 },
+    spaces: { value: { id: spaceId, role: userRole, index: 2 } },
   },
-  type: DBOperations.Update,
+  operation: DBOperations.Update,
 }
 
 // output
@@ -258,13 +258,14 @@ const queryExpression = {
 ```js
 // input
 const queryConditions = {
+  tableName: 'Users',
   where: {
-    id: userId,
+    id: { primary: true, value: userId },
   },
   update: {
-    spaces: [{ id: spaceId, role: userRole }],
+    spaces: { append: true, value: [{ id: spaceId, role: userRole }] },
   },
-  type: DBOperations.Update,
+  operation: DBOperations.Update,
 }
 
 // output
@@ -286,15 +287,16 @@ const queryExpression = {
 ```js
 // input
 const queryConditions = {
+  tableName: 'Users',
   where: {
-    id: userId,
+    id: { primary: true, value: userId },
   },
   update: {
-    email: userEmail,
-    domain: 'www.me.com',
-    returnValues: 'ALL_NEW',
+    email: { value: userEmail },
+    domain: { value: 'www.me.com' },
   },
-  type: DBOperations.Update,
+  returnValues: 'ALL_NEW',
+  operation: DBOperations.Update,
 }
 
 // output
@@ -315,14 +317,15 @@ const queryExpression = {
 
 ```js
 // input
-const queryConditions = {
+const conditions = {
+  tableName: 'Users',
   where: {
-    id: userId,
+    id: { primary: true, value: userId },
   },
   remove: {
     email: null,
   },
-  type: DBOperations.Update,
+  operation: DBOperations.Update,
 }
 
 // output
@@ -340,12 +343,12 @@ const queryExpression = {
 // input
 const queryConditions = {
   where: {
-    id: userId,
+    id: { primary: true, value: userId },
   },
   remove: {
     spaces: { index: 3 },
   },
-  type: DBOperations.Update,
+  operation: DBOperations.Update,
 }
 
 // output
@@ -363,16 +366,16 @@ const queryExpression = {
 // input
 const queryConditions = {
   where: {
-    id: userId,
+    id: { primary: true, value: userId },
   },
   update: {
-    email: userEmail,
-    domain: 'www.me.com',
+    email: { value: userEmail },
+    domain: { value: 'www.me.com' },
   },
   remove: {
     spaces: { index: 3 },
   },
-  type: DBOperations.Update,
+  operation: DBOperations.Update,
 }
 
 // output
