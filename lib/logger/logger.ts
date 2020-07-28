@@ -2,7 +2,7 @@ import { DocumentNode } from 'graphql'
 import { v4 } from 'uuid'
 import { LambdaLog } from 'lambda-log'
 
-const logger = new LambdaLog({
+const logger: LambdaLog = new LambdaLog({
   dev: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test',
   debug: true,
 })
