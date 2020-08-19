@@ -121,7 +121,7 @@ export function processUpdateExpression(
 
       if (
         keyValues.value &&
-        keyValues.value.index &&
+        typeof keyValues.value.index !== 'undefined' &&
         keyValues.value.index >= 0
       ) {
         return `#${key}[${keyValues.value.index}] = :${key}`

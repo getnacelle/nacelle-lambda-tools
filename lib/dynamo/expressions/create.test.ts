@@ -287,6 +287,33 @@ describe('Dynamo Expression Builder', () => {
       expect(result).toEqual(expectedResult)
     })
 
+    it('should create an update expression to edit the first item in a list if index is 0', () => {
+      const conditions = {
+        tableName: 'Users',
+        where: {
+          id: { primary: true, value: userId },
+        },
+        update: {
+          spaces: { value: { id: spaceId, role: userRole, index: 0 } },
+        },
+        operation: DBOperations.Update,
+      }
+
+      const result = createExpression(conditions)
+
+      const expectedResult = {
+        TableName: 'Users',
+        Key: { id: userId },
+        ExpressionAttributeNames: { '#spaces': 'spaces' },
+        ExpressionAttributeValues: {
+          ':spaces': { id: spaceId, role: userRole },
+        },
+        UpdateExpression: 'SET #spaces[0] = :spaces',
+      }
+
+      expect(result).toEqual(expectedResult)
+    })
+
     it('should create an update expression to append list items', () => {
       const conditions = {
         tableName: 'Users',
