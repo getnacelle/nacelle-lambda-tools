@@ -29,5 +29,6 @@ export const isFeatureAllowed = async ({
   if (result?.Items.length < 1) {
     throw new Error(`Could not find space with id ${spaceId} in database`)
   }
+
   return result?.Items[0]?.featureFlags.indexOf(featureName) > -1
 }
