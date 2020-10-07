@@ -23,6 +23,7 @@ export interface Space {
   users: User[]
   linklists: LinkList[]
   metafields?: MetaField[]
+  featureFlags?: string[]
 }
 
 export interface CheckoutDataConfig extends BaseConfig {
