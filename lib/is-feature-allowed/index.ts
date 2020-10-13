@@ -19,11 +19,15 @@ export const isFeatureAllowed = async ({
 }): Promise<boolean> => {
   if (envOverride) return true
 
+  if (!space && !spaceId) return false
+
   const featureFlags = space ? space?.featureFlags : await getFeatureFlags(spaceId)
   return featureFlags?.indexOf(featureName) > -1
 }
 
 const getFeatureFlags = async (spaceId: string): Promise<string[]> => {
+  if (!spaceId) return []
+
   const queryConditions = {
     tableName: 'Spaces',
     where: {
