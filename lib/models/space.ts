@@ -11,6 +11,7 @@ export interface Space {
   domain: string
   name: string
   token: string
+  publicToken?: string
   type: string
   buildHook?: string
   pimSyncSourceDomain?: string

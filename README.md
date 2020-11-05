@@ -394,3 +394,33 @@ const queryExpression = {
   UpdateExpression: 'SET #email = :email, #domain = :domain REMOVE #spaces[3]',
 }
 ```
+
+### isFeatureAllowed
+Utility function used to determine whether or not a feature is allowed.
+
+params:
+
+- _featureName(required)_: Name of the feature flag as it is on the space object
+
+- _space(optional)_: Space. Must be used for non-lambda projects for db permissions reasons. Will check this before fetching the space data from dynamo if provided.
+
+- _spaceId(optional)_: If space param is not provided, the space data will be fetched from dynamoDB using this id.
+
+- _envOverride(optional)_: If the environment var is set to 'true', this will override the space's featureFlags. 
+
+Note: One of the `space`, `spaceId`, or `envOverride` params must be provided, or the result will automatically be false.
+
+```js
+import { isFeatureAllowed } from '@nacelle/lambda-tools'
+
+const isExampleFeatureAllowed = await isFeatureAllowed({
+  featureName: 'exampleFeature',
+  space: exampleSpace,
+  spaceId: exampleSpaceId,
+  envOverride: process.env.FEATURE_EXAMPLE === 'true'
+})
+
+if (isExampleFeatureAllowed) {
+  // do something for spaces with the example featureFlag
+}
+```
