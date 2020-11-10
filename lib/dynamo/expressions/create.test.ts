@@ -176,6 +176,32 @@ describe('Dynamo Expression Builder', () => {
 
       expect(result).toEqual(expectedResult)
     })
+
+    it('should accept paginated result keys and create the appropriate expression key for paginated results', () => {
+      const conditions = {
+        tableName: 'Users',
+        where: {
+          id: { value: userId },
+        },
+        operation: DBOperations.Scan,
+        lastEvaluatedKey: { id: 'abc123' },
+      }
+
+      const result = createExpression(conditions)
+      const expectedResult = {
+        TableName: 'Users',
+        FilterExpression: '#id = :id',
+        ExpressionAttributeNames: {
+          '#id': 'id',
+        },
+        ExpressionAttributeValues: {
+          ':id': userId,
+        },
+        ExclusiveStartKey: conditions.lastEvaluatedKey,
+      }
+
+      expect(result).toEqual(expectedResult)
+    })
   })
 
   describe('Update', () => {
