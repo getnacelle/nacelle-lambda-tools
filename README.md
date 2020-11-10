@@ -197,6 +197,57 @@ const queryExpression = {
 }
 ```
 
+#### Handle Paginated Scans
+
+```js
+// input
+const conditions = {
+  tableName: 'Users',
+  where: {
+    id: { value: userId },
+  },
+  operation: DBOperations.Scan,
+  lastEvaluatedKey: { id: 'abc123' },
+}
+
+//output
+const queryExpression = {
+  TableName: 'Users',
+  FilterExpression: '#id = :id',
+  ExpressionAttributeNames: {
+    '#id': 'id',
+  },
+  ExpressionAttributeValues: {
+    ':id': userId,
+  },
+  ExclusiveStartKey: {
+    id: 'abc123',
+  },
+}
+
+// example code
+async function scanDb(conditions, results = []) {
+  try {
+    const result = await dynamoDb.scan(conditions)
+    const combinedResults = results.concat(result.Items)
+
+    if (result.LastEvaluatedKey) {
+      return await scanDb(
+        {
+          ...conditions,
+          lastEvaluatedKey: result.LastEvaluatedKey,
+        },
+        combinedResults
+      )
+    }
+
+    return combinedResults
+  } catch (err) {
+    console.error(err)
+  }
+}
+```
+
 #### Update User Info
 
 ```js
@@ -396,6 +447,7 @@ const queryExpression = {
 ```
 
 ### isFeatureAllowed
+
 Utility function used to determine whether or not a feature is allowed.
 
 params:
@@ -406,7 +458,7 @@ params:
 
 - _spaceId(optional)_: If space param is not provided, the space data will be fetched from dynamoDB using this id.
 
-- _envOverride(optional)_: If the environment var is set to 'true', this will override the space's featureFlags. 
+- _envOverride(optional)_: If the environment var is set to 'true', this will override the space's featureFlags.
 
 Note: One of the `space`, `spaceId`, or `envOverride` params must be provided, or the result will automatically be false.
 
@@ -417,7 +469,7 @@ const isExampleFeatureAllowed = await isFeatureAllowed({
   featureName: 'exampleFeature',
   space: exampleSpace,
   spaceId: exampleSpaceId,
-  envOverride: process.env.FEATURE_EXAMPLE === 'true'
+  envOverride: process.env.FEATURE_EXAMPLE === 'true',
 })
 
 if (isExampleFeatureAllowed) {
