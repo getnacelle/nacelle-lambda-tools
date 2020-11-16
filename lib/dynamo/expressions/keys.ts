@@ -48,3 +48,27 @@ export function buildKeyConditionExpression(
     },
   }
 }
+
+/**
+ * Adds ExclusiveStartKey to the expression if lastEvaluatedKey is provided in
+ * the query conditions. This is the key that Dynamo uses for returning paginated
+ * results
+ *
+ * @param expressionMap - The current expressionMap
+ *
+ * @return A modified expression map contianing the ExclusiveStartKey, or an
+ * unmodified expressionMap if lastEvaluatedKey is not present
+ */
+export function addPaginationKey(expressionMap: ExpressionMap): ExpressionMap {
+  if (!expressionMap.conditions.lastEvaluatedKey) {
+    return expressionMap
+  }
+
+  return {
+    ...expressionMap,
+    expression: {
+      ...expressionMap.expression,
+      ExclusiveStartKey: expressionMap.conditions.lastEvaluatedKey,
+    },
+  }
+}
