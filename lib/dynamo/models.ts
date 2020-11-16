@@ -65,6 +65,9 @@ export interface QueryConditions {
   itemIndex?: number
   operation: DBOperations
   returnValues?: string
+  lastEvaluatedKey?: {
+    id: string
+  }
 }
 
 export interface QueryExpression {
@@ -77,6 +80,9 @@ export interface QueryExpression {
   ExpressionAttributeValues?: ExpressionAttributeValues
   UpdateExpression?: string
   ReturnValues?: string
+  ExclusiveStartKey?: {
+    id: string
+  }
 }
 
 export interface WhereObjectValue {

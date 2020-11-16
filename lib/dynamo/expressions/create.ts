@@ -1,16 +1,20 @@
 import flow from 'lodash/fp/flow'
 
+import { buildProjectionExpression } from './projections'
+import { buildExpressionAttributeNames } from './attribute-names'
+import { processWhereFilter, buildFilterExpression } from './where-filters'
+import { buildExpressionAttributeValues } from './attribute-values'
 import {
   QueryConditions,
   ExpressionMap,
   QueryExpression,
   AttributeValue,
 } from '../models'
-import { buildProjectionExpression } from './projections'
-import { buildUpdateKeyExpression, buildKeyConditionExpression } from './keys'
-import { buildExpressionAttributeNames } from './attribute-names'
-import { processWhereFilter, buildFilterExpression } from './where-filters'
-import { buildExpressionAttributeValues } from './attribute-values'
+import {
+  buildUpdateKeyExpression,
+  buildKeyConditionExpression,
+  addPaginationKey,
+} from './keys'
 import {
   buildUpdateExpression,
   processUpdateValues,
@@ -47,6 +51,7 @@ export function createExpression(conditions: QueryConditions): QueryExpression {
         validateQueryConditions,
         addTableName,
         processWhereFilter,
+        addPaginationKey,
         buildFilterExpression,
         buildExpressionAttributeNames,
         buildExpressionAttributeValues,
