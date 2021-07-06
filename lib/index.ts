@@ -1,6 +1,7 @@
 export * from './filters'
 export * from './dynamo'
 export * from './s3'
+export * from './cloudfront'
 export * from './urls'
 export * from './mocks'
 export * from './models'
