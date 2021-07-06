@@ -8,6 +8,8 @@ A collection of useful functions for building Serverless lambdas.
   - Wraps Dynamo methods and builds query expressions (more info below)
 - AWS S3 Tools
   - Utility functions for saving & loading JSON files in S3 buckets
+- AWS CloudFront Tools
+  - Utility functions for invalidating cache for a distribution.
 - AWS SES Tools
   - Utility functions for sending emails via SES
 - Lambda Logger
@@ -40,6 +42,35 @@ import { S3 } from 'aws-sdk'
 import { s3Tools } from '@nacelle/lambda-tools'
 
 export const s3 = s3Tools.init(new S3({ apiVersion: '2006-03-01' }))
+```
+
+### CloudFront Tools
+
+params:
+
+- _distributionId(required)_: String. Id of the CloudFront distribution you want to invalidate the cache of.
+
+- _quantity(required)_: Int. The number of invalidation paths specified for the objects that you want to invalidate.
+
+- _spaceId(optional)_: String[]. Array of paths to invalidate.
+
+```js
+import { CloudFront } from 'aws-sdk'
+import { cloudfrontTools } from '@nacelle/lambda-tools'
+
+export const cloudfront = cloudfrontTools.init(new CloudFront({
+  apiVersion: '2020-05-31'
+  })
+)
+
+const distributionId = 'E1FLDI5PK7XUGF'
+const quantity = 1
+const paths = ['/*']
+const response: CloudFront.CreateInvalidationResult = await cloudfront.invalidateCache(
+    distributionId,
+    quantity,
+    paths
+  )
 ```
 
 ### SES Tools
