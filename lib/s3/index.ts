@@ -1,3 +1,3 @@
-import { s3Tools } from './storage'
+import { s3Tools, S3Tools } from './storage'
 
-export { s3Tools }
+export { s3Tools, S3Tools }

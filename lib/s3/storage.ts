@@ -11,6 +11,8 @@ interface S3Tools {
   ) => Promise<PromiseResult<S3.PutObjectOutput, AWSError>>
 
   loadJSON: (bucket: string, key: string) => Promise<Record<string, unknown>>
+
+  emptyDirectory: (bucket: string, dir: string) => Promise<boolean>
 }
 
 function init(s3Instance: S3): S3Tools {
@@ -48,9 +50,34 @@ function init(s3Instance: S3): S3Tools {
       const json = awsResult.Body.toString('utf-8')
       return JSON.parse(json)
     },
+    emptyDirectory: async function emptyDirectory(
+      bucket: string,
+      dir: string
+    ): Promise<boolean> {
+      const listParams = {
+        Bucket: bucket,
+        Prefix: dir,
+      }
+      const listedObjects = await s3Instance.listObjectsV2(listParams).promise()
+
+      if (listedObjects.Contents.length === 0) return true
+
+      const deleteParams = {
+        Bucket: bucket,
+        Delete: { Objects: [] },
+      }
+
+      listedObjects.Contents.forEach(({ Key }) => {
+        deleteParams.Delete.Objects.push({ Key })
+      })
+
+      await s3Instance.deleteObjects(deleteParams).promise()
+
+      if (listedObjects.IsTruncated) await this.emptyDirectory(bucket, dir)
+    },
   }
 }
 
 const s3Tools = { init }
 
-export { s3Tools }
+export { s3Tools, S3Tools }
